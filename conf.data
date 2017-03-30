@@ -4,3 +4,5 @@ stopper
 .\palabrasVacias.txt
 stemmer
 index
+index\IDFs
+index\WNij
