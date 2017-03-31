@@ -66,7 +66,7 @@ public class IRS {
         BufferedReader br = new BufferedReader(new FileReader(conf.get(index[3])));
         ArrayList<String> emptyWords = Stopper.loadEmptyWords(br);
         
-        ArrayList<Pair<Float, String>> ID = new ArrayList<>();        
+        HashMap<Float, String> ID = new HashMap<>();        
         float objtIndex = 1;
         
         //MAIN LOOP
@@ -101,7 +101,7 @@ public class IRS {
             countStemmer = StringUtils.countMatches(noRoots, "\n");
             countAllStemmer += countStemmer;
             
-            ID.add(new Pair<>(objtIndex, file.getAbsolutePath()));
+            ID.put(objtIndex, file.getAbsolutePath());
             objtIndex++;
             
             //VSM.highestFrequency(file.getAbsolutePath());
@@ -191,7 +191,7 @@ public class IRS {
         
         HashMap<Integer, HashMap<String,Double>> wij = VSM.wij(idf, VSMstructure);
         
-        HashMap<Integer, Double> wnij = VSM.wnij(wij);
+        HashMap<Integer, HashMap<String,Double>> wnij = VSM.wnij(wij, idf);
         
         //Write in the file WNij
         String newPathWN = conf.get(index[7]) + '\\' + "WNij.txt";
@@ -205,7 +205,6 @@ public class IRS {
             });
             //end of file IDF
         }
-        
         System.out.println("");
         
         time_end = System.currentTimeMillis();

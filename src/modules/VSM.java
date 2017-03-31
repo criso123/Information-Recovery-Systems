@@ -80,21 +80,19 @@ public class VSM {
     public static HashMap<String, Double> idf (HashMap<String, Integer> array, HashMap<Integer, HashMap<String,Double>> map, int n) {
         HashMap<String, Integer> tmp = new HashMap<>();
         HashMap<String, Double> output = new HashMap<>();
-        //Initialize of output
-        array.entrySet().forEach((entry) -> {
-            tmp.put(entry.getKey(), 0);
-        });
-        //dfi
-        map.entrySet().stream().map((entry) -> entry.getValue()).forEachOrdered((HashMap<String, Double> words) -> {
-            words.entrySet().stream().filter((e) -> (array.containsKey(e.getKey()))).forEachOrdered((e) -> {
-                tmp.put(e.getKey(), tmp.get(e.getKey())+1);
+        
+        map.entrySet().stream().map((e) -> e.getValue()).forEachOrdered((HashMap<String, Double> words) -> {
+            words.entrySet().forEach((Map.Entry<String, Double> e2) -> {
+                if (tmp.containsKey(e2.getKey())) {
+                    tmp.put(e2.getKey(),tmp.get(e2.getKey())+1);
+                } else {
+                    tmp.put(e2.getKey(), 1);
+                }
             });
         });
-        //IDFs
-        tmp.entrySet().forEach((entry) -> {
-            output.put(entry.getKey(), Math.log10(n/entry.getValue()));
+        tmp.entrySet().forEach((e) -> {
+            output.put(e.getKey(), Math.log10(n/e.getValue()));
         });
-        
         return output;
     }
     /**
@@ -107,18 +105,14 @@ public class VSM {
         HashMap<String, Double> tmp = new HashMap<>();
         
         for (Map.Entry<Integer, HashMap<String, Double>> entry : map.entrySet()){
-//            for (Map.Entry<String, Float> eIDF : idf.entrySet()) {
                 HashMap<String, Double> words = entry.getValue();
                 tmp = new HashMap<>();
-                for (Map.Entry<String, Double> e : words.entrySet()) {
-                    if (idf.containsKey(e.getKey())) {
+                for (Map.Entry<String, Double> e : idf.entrySet()) {
+                    if (words.containsKey(e.getKey())) {
                         //normal
                         tmp.put(e.getKey(), idf.get(e.getKey())*e.getValue());
-                        //^2
-//                        tmp.put(e.getKey(), Math.pow(idf.get(e.getKey())*e.getValue()),2);
                     }
                 }
-//            }
             output.put(entry.getKey(), tmp);
         }
         return output;
@@ -126,28 +120,31 @@ public class VSM {
     /**
      * Normalized weights of all words of each document
      * @param map main data structure with words of each document
+     * @param idf data structure with documentary frequency of each word
      * @return data structure with the weight of each word in each document
      */
-    public static HashMap<Integer, Double> wnij (HashMap<Integer, HashMap<String, Double>> map) {
-        HashMap<Integer, Double> output = new HashMap<>();
+ public static HashMap<Integer, HashMap<String, Double>> wnij (HashMap<Integer, HashMap<String, Double>> map, HashMap<String, Double> idf) {
+        HashMap<Integer, HashMap<String, Double>> output = new HashMap<>();
         HashMap<String, Double> tmp = new HashMap<>();
         HashMap<Integer, Double> param1 = new HashMap<>();
-        
-        int index = 0;
         
         for (Map.Entry<Integer, HashMap<String, Double>> entry : map.entrySet()){
                 HashMap<String, Double> words = entry.getValue();
                 tmp = new HashMap<>();
-                double cont = 0;
+                double cont = 0, root = 0;
                 for (Map.Entry<String, Double> e : words.entrySet()) {
                     tmp.put(e.getKey(), Math.pow(e.getValue(), 2));
                     cont += Math.pow(e.getValue(), 2);
                 }
                 //Normalizate
-                Math.sqrt(cont);
-                for (Map.Entry<String, Double> e : words.entrySet()) {
-                    output.put(entry.getKey(), e.getValue()/cont);
+                
+                root = Math.sqrt(cont);
+                double suma = 0;
+                
+                for (Map.Entry<String, Double> e : idf.entrySet()) {
+                    tmp.replace(e.getKey(), e.getValue()/root);
                 }
+                output.put(entry.getKey(), tmp);
         }
         return output;
     }
