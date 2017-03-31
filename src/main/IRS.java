@@ -1,8 +1,5 @@
 package main;
 
-
-
-//import org.apache.commons.lang3.StringUtils;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -11,9 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.PriorityQueue;
-import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import modules.Index;
@@ -179,21 +174,20 @@ public class IRS {
         
         HashMap<Integer, HashMap<String,Double>> VSMstructure = new HashMap<>();
         VSMstructure = VSM.highestFrequency(conf.get(index[4]));
-        
         HashMap<String, Double> idf = VSM.idf(DS, VSMstructure, files.length);
         
         //Write in the file IDF
         String newPathIDF = conf.get(index[6]) + '\\' + "IDF.txt";
-        BufferedWriter bwIDF = new BufferedWriter(new FileWriter(newPathIDF));
-        idf.forEach((k,v) -> {
-            try {
-                bwIDF.write("key: "+k+" value:"+v+'\n');
-            } catch (IOException ex) {
-                Logger.getLogger(IRS.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        });
-        bwIDF.close();
-        //end of file IDF
+        try (BufferedWriter bwIDF = new BufferedWriter(new FileWriter(newPathIDF))) {
+            idf.forEach((k,v) -> {
+                try {
+                    bwIDF.write("key: "+k+" value:"+v+'\n');
+                } catch (IOException ex) {
+                    Logger.getLogger(IRS.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            });
+            //end of file IDF
+        }
         
         HashMap<Integer, HashMap<String,Double>> wij = VSM.wij(idf, VSMstructure);
         
@@ -201,16 +195,16 @@ public class IRS {
         
         //Write in the file WNij
         String newPathWN = conf.get(index[7]) + '\\' + "WNij.txt";
-        BufferedWriter bwWN = new BufferedWriter(new FileWriter(newPathWN));
-        wnij.forEach((k,v) -> {
-            try {
-                bwWN.write("key: "+k+" value:"+v+'\n');
-            } catch (IOException ex) {
-                Logger.getLogger(IRS.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        });
-        bwWN.close();
-        //end of file IDF
+        try (BufferedWriter bwWN = new BufferedWriter(new FileWriter(newPathWN))) {
+            wnij.forEach((k,v) -> {
+                try {
+                    bwWN.write("key: "+k+" value:"+v+'\n');
+                } catch (IOException ex) {
+                    Logger.getLogger(IRS.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            });
+            //end of file IDF
+        }
         
         System.out.println("");
         

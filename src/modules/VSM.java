@@ -10,22 +10,21 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import main.Pair;
 
 /**
  *
  * @author criso
  */
 public class VSM {
+    /**
+     * Normalized frequency of all words of each document
+     * @param path document or collection that will be process
+     * @return data structure with the data of file with the normalized frequency
+     * @throws java.io.FileNotFoundException
+     * @throws java.io.IOException
+     */
     public static HashMap<Integer, HashMap<String,Double>> highestFrequency (String path) throws FileNotFoundException, IOException {
         double max = 0, cont = 0;
         int i=1;
@@ -71,29 +70,38 @@ public class VSM {
         }     
         return output;    
     }
-
+    /**
+     * Create a data structure with documentary frequency of each word
+     * @param array data structure with all differents words
+     * @param map main data structure with words of each document
+     * @param n size of collection
+     * @return data structure with the data of file with the normalized frequency
+     */
     public static HashMap<String, Double> idf (HashMap<String, Integer> array, HashMap<Integer, HashMap<String,Double>> map, int n) {
         HashMap<String, Integer> tmp = new HashMap<>();
         HashMap<String, Double> output = new HashMap<>();
         //Initialize of output
-        for (Map.Entry<String, Integer> entry : array.entrySet()) {
+        array.entrySet().forEach((entry) -> {
             tmp.put(entry.getKey(), 0);
-        }
+        });
         //dfi
-        for (Map.Entry<Integer, HashMap<String, Double>> entry : map.entrySet()) {
-            HashMap<String, Double> words = entry.getValue();
-            for (Map.Entry<String, Double> e : words.entrySet()) 
-                if (array.containsKey(e.getKey())){
-                    tmp.put(e.getKey(), tmp.get(e.getKey())+1);
-                }
-        }
+        map.entrySet().stream().map((entry) -> entry.getValue()).forEachOrdered((HashMap<String, Double> words) -> {
+            words.entrySet().stream().filter((e) -> (array.containsKey(e.getKey()))).forEachOrdered((e) -> {
+                tmp.put(e.getKey(), tmp.get(e.getKey())+1);
+            });
+        });
         //IDFs
-        for (Map.Entry<String, Integer> entry : tmp.entrySet()) {
+        tmp.entrySet().forEach((entry) -> {
             output.put(entry.getKey(), Math.log10(n/entry.getValue()));
-        }
+        });
         
         return output;
     }
+    /**
+     * @param idf data structure with documentary frequency of each word
+     * @param map main data structure with words of each document
+     * @return data structure with the weight of each word in collection
+     */
     public static HashMap<Integer, HashMap<String, Double>> wij (HashMap<String, Double> idf, HashMap<Integer, HashMap<String, Double>> map) {
         HashMap<Integer, HashMap<String, Double>> output = new HashMap<>();
         HashMap<String, Double> tmp = new HashMap<>();
@@ -115,6 +123,11 @@ public class VSM {
         }
         return output;
     }
+    /**
+     * Normalized weights of all words of each document
+     * @param map main data structure with words of each document
+     * @return data structure with the weight of each word in each document
+     */
     public static HashMap<Integer, Double> wnij (HashMap<Integer, HashMap<String, Double>> map) {
         HashMap<Integer, Double> output = new HashMap<>();
         HashMap<String, Double> tmp = new HashMap<>();
@@ -130,8 +143,11 @@ public class VSM {
                     tmp.put(e.getKey(), Math.pow(e.getValue(), 2));
                     cont += Math.pow(e.getValue(), 2);
                 }
+                //Normalizate
                 Math.sqrt(cont);
-                output.put(entry.getKey(), cont);
+                for (Map.Entry<String, Double> e : words.entrySet()) {
+                    output.put(entry.getKey(), e.getValue()/cont);
+                }
         }
         return output;
     }
