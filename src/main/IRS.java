@@ -8,7 +8,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.PriorityQueue;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import modules.Index;
@@ -17,6 +19,11 @@ import modules.Stopper;
 import modules.Tokenization;
 import modules.VSM;
 import org.apache.commons.lang3.StringUtils;
+import org.jdom.Attribute;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -103,8 +110,6 @@ public class IRS {
             
             ID.put(objtIndex, file.getAbsolutePath());
             objtIndex++;
-            
-            //VSM.highestFrequency(file.getAbsolutePath());
              
             //OPERATIONS
             //MINIMUM
@@ -193,18 +198,28 @@ public class IRS {
         
         HashMap<Integer, HashMap<String,Double>> wnij = VSM.wnij(wij, idf);
         
-        //Write in the file WNij
-        String newPathWN = conf.get(index[7]) + '\\' + "WNij.txt";
-        try (BufferedWriter bwWN = new BufferedWriter(new FileWriter(newPathWN))) {
-            wnij.forEach((k,v) -> {
-                try {
-                    bwWN.write("key: "+k+" value:"+v+'\n');
-                } catch (IOException ex) {
-                    Logger.getLogger(IRS.class.getName()).log(Level.SEVERE, null, ex);
-                }
+        //Write in the XML file WNij
+        Element document = new Element("collection");
+        Document doc = new Document(document);
+        doc.setRootElement(document);
+        wnij.entrySet().stream().map((Map.Entry<Integer, HashMap<String, Double>> entry) -> {
+            //attribute key
+            Element key = new Element("document");
+            key.setAttribute(new Attribute("id",entry.getKey().toString()));
+            //attribute value
+            HashMap<String, Double> words = entry.getValue();
+            words.entrySet().forEach((e) -> {
+                key.addContent(new Element("doc"+entry.getKey().toString()+"."+e.getKey()).setText(e.getValue().toString()));
             });
-            //end of file IDF
-        }
+            return key;
+        }).forEachOrdered((key) -> {
+            doc.getRootElement().addContent(key);
+        });
+        XMLOutputter xmlOutput = new XMLOutputter();
+        xmlOutput.setFormat(Format.getPrettyFormat());
+        xmlOutput.output(doc, new FileWriter(conf.get(index[7]) + '\\' + "WNij.xml"));
+        //end of the XML file WNij
+            
         System.out.println("");
         
         time_end = System.currentTimeMillis();
