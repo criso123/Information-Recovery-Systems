@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.PriorityQueue;
-import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import modules.Index;
@@ -73,6 +72,7 @@ public class IRS {
         BufferedReader br = new BufferedReader(new FileReader(conf.get(index[3])));
         ArrayList<String> emptyWords = Stopper.loadEmptyWords(br);
         
+        //PATH OF EACH DOCUMENT IN THE COLLECTION
         HashMap<Float, String> ID = new HashMap<>();        
         float objtIndex = 1;
         
@@ -90,24 +90,29 @@ public class IRS {
             String newPathEW = conf.get(index[2]) + '\\' + name;
             String newPathStemmer = conf.get(index[4]) + '\\' + name;
             
+            //WRITE IN THE FOLDERS
             BufferedWriter bw, bwEW, bwStemmer, bwIndex;
             bw = new BufferedWriter(new FileWriter(newPath));
             bwEW = new BufferedWriter(new FileWriter(newPathEW));
             bwStemmer = new BufferedWriter(new FileWriter(newPathStemmer));
             
+            //TOKENIZATION
             count = Tokenization.tokenization(bw, noAccents);
             countAll += count;
             
+            //STOPPER
             String noEmptyWords = Stopper.tokenizationAfter(emptyWords, bwEW, noAccents);
             
             countAfter = StringUtils.countMatches(noEmptyWords, "\n");
             countAllAfter += countAfter;
             
+            //STEMMER
             String noRoots = Stemmer.roots(noEmptyWords, bwStemmer);
             
             countStemmer = StringUtils.countMatches(noRoots, "\n");
             countAllStemmer += countStemmer;
             
+            //INDEX
             ID.put(objtIndex, file.getAbsolutePath());
             objtIndex++;
              
@@ -124,6 +129,7 @@ public class IRS {
 
         }
         
+        //TOP 5 OF EACH MODULE
         ArrayList<Pair<String, Integer>> mostFreq = top5(conf.get(index[1]));
         ArrayList<Pair<String, Integer>> mostFreqAfter = top5(conf.get(index[2]));
         ArrayList<Pair<String, Integer>> mostFreqStem = top5(conf.get(index[4]));
@@ -174,14 +180,14 @@ public class IRS {
         System.out.println("We have: "+DS.size()+" different words.");
         System.out.println("");
         System.out.println("-----------------------------------------------");
-        System.out.println("-    After of create Vector Space Model:      -");
+        System.out.println("-   Creating the index & Vector Space Model   -");
         System.out.println("-----------------------------------------------");
         
         HashMap<Integer, HashMap<String,Double>> VSMstructure = new HashMap<>();
         VSMstructure = VSM.highestFrequency(conf.get(index[4]));
         HashMap<String, Double> idf = VSM.idf(DS, VSMstructure, files.length);
         
-        //Write in the file IDF
+        //Write in the file IDF.txt
         String newPathIDF = conf.get(index[6]) + '\\' + "IDF.txt";
         try (BufferedWriter bwIDF = new BufferedWriter(new FileWriter(newPathIDF))) {
             idf.forEach((k,v) -> {
@@ -199,21 +205,25 @@ public class IRS {
         HashMap<Integer, HashMap<String,Double>> wnij = VSM.wnij(wij, idf);
         
         //Write in the XML file WNij
-        Element document = new Element("collection");
-        Document doc = new Document(document);
-        doc.setRootElement(document);
+        Element collection = new Element("collection");
+        Document doc = new Document(collection);
+        doc.setRootElement(collection);
         wnij.entrySet().stream().map((Map.Entry<Integer, HashMap<String, Double>> entry) -> {
-            //attribute key
-            Element key = new Element("document");
-            key.setAttribute(new Attribute("id",entry.getKey().toString()));
-            //attribute value
+            //attribute key of frist map
+            Element keyDoc = new Element("document");
+            //attribute value of the first map
             HashMap<String, Double> words = entry.getValue();
+            //second map
+            Element word = new Element("words");
             words.entrySet().forEach((e) -> {
-                key.addContent(new Element("doc"+entry.getKey().toString()+"."+e.getKey()).setText(e.getValue().toString()));
+                word.setAttribute(new Attribute("id",entry.getKey().toString()));
+                word.addContent(new Element("key").setText(e.getKey()));
+                word.addContent(new Element("value").setText(e.getValue().toString()));
             });
-            return key;
-        }).forEachOrdered((key) -> {
-            doc.getRootElement().addContent(key);
+            return word;
+        }).forEachOrdered((keyDoc) -> {
+            doc.getRootElement().addContent(keyDoc);
+            
         });
         XMLOutputter xmlOutput = new XMLOutputter();
         xmlOutput.setFormat(Format.getPrettyFormat());
