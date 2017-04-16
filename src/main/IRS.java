@@ -127,22 +127,22 @@ public class IRS {
 
         }
         
-//        //Write in the XML file called ID
-//        Element docu = new Element("document");
-//        Document docum = new Document(docu);
-//        docum.setRootElement(docu);
-//        ID.entrySet().stream().map((Map.Entry<Integer, String> entry) -> {
-//            Element word = new Element("word");
-//                word.addContent(new Element("key").setText(entry.getKey().toString()));
-//                word.addContent(new Element("value").setText(entry.getValue().toString()));
-//            return word;
-//        }).forEachOrdered((word) -> {
-//            docum.getRootElement().addContent(word);
-//            
-//        });
-//        XMLOutputter xmlOutputID = new XMLOutputter();
-//        xmlOutputID.setFormat(Format.getPrettyFormat());
-//        xmlOutputID.output(docum, new FileWriter(conf.get(index[5]) + '\\' + "ID.xml"));
+        //Write in the XML file called ID
+        Element docu = new Element("document");
+        Document docum = new Document(docu);
+        docum.setRootElement(docu);
+        ID.entrySet().stream().map((Map.Entry<Integer, String> entry) -> {
+            Element word = new Element("word");
+                word.addContent(new Element("key").setText(entry.getKey().toString()));
+                word.addContent(new Element("value").setText(entry.getValue().toString()));
+            return word;
+        }).forEachOrdered((word) -> {
+            docum.getRootElement().addContent(word);
+            
+        });
+        XMLOutputter xmlOutputID = new XMLOutputter();
+        xmlOutputID.setFormat(Format.getPrettyFormat());
+        xmlOutputID.output(docum, new FileWriter(conf.get(index[5]) + '\\' + "ID.xml"));
         //end of the XML file IDF
         
         //TOP 5 OF EACH MODULE
