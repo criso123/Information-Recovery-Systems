@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.PriorityQueue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import modules.Index;
 import modules.Stemmer;
 import modules.Stopper;
@@ -72,9 +70,9 @@ public class IRS {
         BufferedReader br = new BufferedReader(new FileReader(conf.get(index[3])));
         ArrayList<String> emptyWords = Stopper.loadEmptyWords(br);
         
-        //PATH OF EACH DOCUMENT IN THE COLLECTION
-        HashMap<Float, String> ID = new HashMap<>();        
-        float objtIndex = 1;
+      //PATH OF EACH DOCUMENT IN THE COLLECTION
+        HashMap<Integer, String> ID = new HashMap<>();        
+        int objtIndex = 1;
         
         //MAIN LOOP
         System.out.println("Wait.....");
@@ -129,6 +127,24 @@ public class IRS {
 
         }
         
+//        //Write in the XML file called ID
+//        Element docu = new Element("document");
+//        Document docum = new Document(docu);
+//        docum.setRootElement(docu);
+//        ID.entrySet().stream().map((Map.Entry<Integer, String> entry) -> {
+//            Element word = new Element("word");
+//                word.addContent(new Element("key").setText(entry.getKey().toString()));
+//                word.addContent(new Element("value").setText(entry.getValue().toString()));
+//            return word;
+//        }).forEachOrdered((word) -> {
+//            docum.getRootElement().addContent(word);
+//            
+//        });
+//        XMLOutputter xmlOutputID = new XMLOutputter();
+//        xmlOutputID.setFormat(Format.getPrettyFormat());
+//        xmlOutputID.output(docum, new FileWriter(conf.get(index[5]) + '\\' + "ID.xml"));
+        //end of the XML file IDF
+        
         //TOP 5 OF EACH MODULE
         ArrayList<Pair<String, Integer>> mostFreq = top5(conf.get(index[1]));
         ArrayList<Pair<String, Integer>> mostFreqAfter = top5(conf.get(index[2]));
@@ -136,6 +152,13 @@ public class IRS {
         
       
         //OUTPUT OF DATA
+        System.out.println("-----------------------------------------------");
+        System.out.println("-             AFTER TOKENIZATION:             -");
+        System.out.println("-----------------------------------------------");
+        System.out.println("We have: "+countAll+" words.");
+        System.out.println("We have: "+countAll/files.length+" per file.");
+        System.out.println("We have: "+files.length+" documents.");
+        System.out.println("");
         System.out.println("-----------------------------------------------");
         System.out.println("-        Before of remove empty words:        -");
         System.out.println("-----------------------------------------------");
@@ -185,20 +208,25 @@ public class IRS {
         
         HashMap<Integer, HashMap<String,Double>> VSMstructure = new HashMap<>();
         VSMstructure = VSM.highestFrequency(conf.get(index[4]));
-        HashMap<String, Double> idf = VSM.idf(DS, VSMstructure, files.length);
+        HashMap<String, Double> idf = VSM.idf(VSMstructure, files.length);
         
-        //Write in the file IDF.txt
-        String newPathIDF = conf.get(index[6]) + '\\' + "IDF.txt";
-        try (BufferedWriter bwIDF = new BufferedWriter(new FileWriter(newPathIDF))) {
-            idf.forEach((k,v) -> {
-                try {
-                    bwIDF.write("key: "+k+" value:"+v+'\n');
-                } catch (IOException ex) {
-                    Logger.getLogger(IRS.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            });
-            //end of file IDF
-        }
+        //Write in the XML file IDF
+        Element wordsIDF = new Element("differents_words");
+        Document document = new Document(wordsIDF);
+        document.setRootElement(wordsIDF);
+        idf.entrySet().stream().map((Map.Entry<String, Double> entry) -> {
+            Element word = new Element("word");
+                word.addContent(new Element("key").setText(entry.getKey()));
+                word.addContent(new Element("value").setText(entry.getValue().toString()));
+            return word;
+        }).forEachOrdered((word) -> {
+            document.getRootElement().addContent(word);
+            
+        });
+        XMLOutputter xmlOutputIDF = new XMLOutputter();
+        xmlOutputIDF.setFormat(Format.getPrettyFormat());
+        xmlOutputIDF.output(document, new FileWriter(conf.get(index[6]) + '\\' + "IDF.xml"));
+        //end of the XML file IDF
         
         HashMap<Integer, HashMap<String,Double>> wij = VSM.wij(idf, VSMstructure);
         
@@ -207,9 +235,9 @@ public class IRS {
         //Write in the XML file WNij
         Element collection = new Element("collection");
         Document doc = new Document(collection);
+        
         doc.setRootElement(collection);
         wnij.entrySet().stream().map((Map.Entry<Integer, HashMap<String, Double>> entry) -> {
-            //attribute key of frist map
             Element keyDoc = new Element("document");
             //attribute value of the first map
             HashMap<String, Double> words = entry.getValue();

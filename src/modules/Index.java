@@ -25,7 +25,7 @@ public class Index {
     /**
      * Create an index wit max, min and frequency of each word
      * @param path document or collection that will be process
-     * @return data structure with the data of file with the frequency
+     * @return data structure with each word and its frequency
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException
      */

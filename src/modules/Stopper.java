@@ -18,17 +18,15 @@ import java.util.StringTokenizer;
 public class Stopper {
     /**
      * Load empty words
-     * @param br file of source where I catch texts
-     * @return data structure with the data of file with the empty words
+     * @param br file where I catch empty words
+     * @return data structure with each empty word
      * @throws java.io.IOException
      */
     public static ArrayList<String> loadEmptyWords (BufferedReader br) throws IOException {
         ArrayList<String> stopWords = new ArrayList<>();
-        Integer cont=0;
         String content = br.readLine();
             while (content != null) {
                 stopWords.add(content);
-                cont++;
                 content = br.readLine();
             }
             return stopWords;
@@ -36,9 +34,9 @@ public class Stopper {
     /**
      * Process the files
      * @param array data structure with empty words
-     * @param bw file of source where I catch texts
+     * @param bw file where I write the texts
      * @param text the text that I follow process
-     * @return data structure with the data of file with the empty words
+     * @return procesed text of each file of the collection
      * @throws java.io.IOException
      */
     public static String tokenizationAfter (ArrayList<String> array, BufferedWriter bw, String text) throws IOException {

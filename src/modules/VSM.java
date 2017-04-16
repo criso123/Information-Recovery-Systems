@@ -21,7 +21,7 @@ public class VSM {
     /**
      * Normalized frequency of all words of each document
      * @param path document or collection that will be process
-     * @return data structure with the data of file with the normalized frequency
+     * @return data structure with the word and the normalized frequency
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException
      */
@@ -72,12 +72,11 @@ public class VSM {
     }
     /**
      * Create a data structure with documentary frequency of each word
-     * @param array data structure with all differents words
      * @param map main data structure with words of each document
      * @param n size of collection
      * @return data structure with the data of file with the normalized frequency
      */
-    public static HashMap<String, Double> idf (HashMap<String, Integer> array, HashMap<Integer, HashMap<String,Double>> map, int n) {
+    public static HashMap<String, Double> idf (HashMap<Integer, HashMap<String,Double>> map, int n) {
         HashMap<String, Integer> tmp = new HashMap<>();
         HashMap<String, Double> output = new HashMap<>();
         
@@ -126,7 +125,6 @@ public class VSM {
  public static HashMap<Integer, HashMap<String, Double>> wnij (HashMap<Integer, HashMap<String, Double>> map, HashMap<String, Double> idf) {
         HashMap<Integer, HashMap<String, Double>> output = new HashMap<>();
         HashMap<String, Double> tmp = new HashMap<>();
-        HashMap<Integer, Double> param1 = new HashMap<>();
         
         for (Map.Entry<Integer, HashMap<String, Double>> entry : map.entrySet()){
                 HashMap<String, Double> words = entry.getValue();

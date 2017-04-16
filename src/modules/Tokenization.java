@@ -19,9 +19,9 @@ import org.jsoup.nodes.Document;
  */
 public class Tokenization {
     /**
-     * Given a file, this function returns the same text without HTML label,
+     * Given a path of a file, this function returns the same text without HTML tags,
      * @param path name of file
-     * @return normalized text
+     * @return text without HTML tags
      * @throws java.io.IOException
      */
     public static String removeHTML (String path) throws IOException {
@@ -53,10 +53,10 @@ public class Tokenization {
         return clean;
     }
     /**
-     * Given a text, this function returns the same text without accents and rare characters,
+     * Given a text, this function returns the same text but each word is tokenized
      * @param text the content of the file
-     * @param bw 
-     * @return normalized text
+     * @param bw path where save this text
+     * @return tokenized text
      * @throws java.io.IOException
      */
     public static int tokenization (BufferedWriter bw, String text) throws IOException {

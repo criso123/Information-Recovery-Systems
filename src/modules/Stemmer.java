@@ -16,8 +16,8 @@ public class Stemmer {
     /**
      * Catch roots of a given text 
      * @param text text with will be process
-     * @param bw file of source where I catch texts
-     * @return data structure with the data of file with the roots
+     * @param bw file where I save texts
+     * @return data structure with the roots
      * @throws java.io.IOException
      */
     static public String roots (String text, BufferedWriter bw) throws IOException{
