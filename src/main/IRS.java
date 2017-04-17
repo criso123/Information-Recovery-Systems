@@ -265,6 +265,7 @@ public class IRS {
     }
     /**
      * Load parameters of conf.data
+     * @throws java.IOException
      */
     private static ArrayList<String> load() throws IOException{
         BufferedReader br = new BufferedReader(new FileReader(new File("conf.data")));
@@ -279,6 +280,7 @@ public class IRS {
     /**
      * It checks if the folder exits, if dont exits it create the folder
      * @param path name of the new folder
+     * @throws java.IOException
      */
     private static void directoryCreation(String path) throws IOException{
         File directory = new File(path);
@@ -293,6 +295,7 @@ public class IRS {
      * Create new files with other extension in a destiny
      * @param pathColection Colection of files
      * @param destiny path of the new folder
+     * @throws java.IOException
      */
     private static void createFiles(String pathColection, String destiny) throws IOException {
         File colection = new File(pathColection);
@@ -309,6 +312,7 @@ public class IRS {
     /**
      * Create a data structure with 5 words most frequents in the text
      * @param path Colection of files
+     * @throws java.IOException
      */
     private static ArrayList<Pair<String,Integer>> top5 (String path) throws IOException {
         PriorityQueue<Pair<String, Integer>> list = new PriorityQueue<>(10,(o1, o2) -> {

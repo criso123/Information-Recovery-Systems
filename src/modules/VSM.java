@@ -74,7 +74,7 @@ public class VSM {
      * Create a data structure with documentary frequency of each word
      * @param map main data structure with words of each document
      * @param n size of collection
-     * @return data structure with the data of file with the normalized frequency
+     * @return data structure with the word and its normalized frequency
      */
     public static HashMap<String, Double> idf (HashMap<Integer, HashMap<String,Double>> map, int n) {
         HashMap<String, Integer> tmp = new HashMap<>();
