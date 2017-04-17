@@ -268,7 +268,7 @@ public class IRS {
      * @throws java.IOException
      */
     private static ArrayList<String> load() throws IOException{
-        BufferedReader br = new BufferedReader(new FileReader(new File("conf.data")));
+        BufferedReader br = new BufferedReader(new FileReader(new File("./conf.data")));
         ArrayList<String> parameters = new ArrayList<>();
         String line;
         
