@@ -62,13 +62,13 @@ public class Tokenization {
     public static int tokenization (BufferedWriter bw, String text) throws IOException {
         int contador=0;
         StringTokenizer tokens=new StringTokenizer(text);
-            while(tokens.hasMoreTokens()){
-                //write each token in the file
-                String token = tokens.nextToken();
-                contador++;
-                bw.write(token+"\n");
-            }
-            bw.close();
-            return contador;
+        while(tokens.hasMoreTokens()){
+            //write each token in the file
+            String token = tokens.nextToken();
+            contador++;
+            bw.write(token+"\n");
+        }
+        bw.close();
+        return contador;
     }
 }

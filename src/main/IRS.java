@@ -42,36 +42,38 @@ public class IRS {
         ArrayList<String> conf = load();
         
         //DECLARATION OF VARIABLES
-        int count, countAfter, countAll = 0, countAllAfter = 0;
-        int[] index = new int[8];
-        for (int i=0; i<8; i++)
+        int countTokenization, countStopper, countAllTokenization = 0, countAllStopper = 0, 
+                countStemmer, countAllStemmer = 0;
+        int[] index = new int[16];
+        for (int i=0; i<16; i++)
             index[i] = i;
-        int countStemmer, countAllStemmer = 0;
         long time_start, time_end;
         time_start = System.currentTimeMillis();
-        int contNuevo2 = 0, contFinal2 = 0, max1 = 0, max2 = 0, max3 = 0, min1 = 9999, min2 = 9999, min3 = 9999;
+        int maxTokenization = 0, maxStopper = 0, maxStemmer = 0, minTokenization = 9999,
+                minStopper = 9999, minStemmer = 9999;
         
         //CREATION OF FOLDER
-        directoryCreation(conf.get(index[1]));
-        directoryCreation(conf.get(index[2]));
-        directoryCreation(conf.get(index[4]));
+        directoryCreation(conf.get(index[3]));
         directoryCreation(conf.get(index[5]));
-        directoryCreation(conf.get(index[6]));
-        directoryCreation(conf.get(index[7]));
-        createFiles(conf.get(index[0]), conf.get(index[1]));
-        createFiles(conf.get(index[1]), conf.get(index[2]));
-        createFiles(conf.get(index[2]), conf.get(index[4]));
+        directoryCreation(conf.get(index[9]));
+        directoryCreation(conf.get(index[11]));
+        directoryCreation(conf.get(index[13]));
+        directoryCreation(conf.get(index[15]));
+        //CREATION OF FILES
+        createFiles(conf.get(index[1]), conf.get(index[3]));
+        createFiles(conf.get(index[3]), conf.get(index[5]));
+        createFiles(conf.get(index[5]), conf.get(index[9]));
         
         //LOAD MAIN FILES WITHOUT PROCESS THEM
-        File colection = new File(conf.get(index[0]));
+        File colection = new File(conf.get(index[1]));
         File files[] = colection.listFiles();
         
         //LOAD THE FILE WITH EMPTY WORDS
-        BufferedReader br = new BufferedReader(new FileReader(conf.get(index[3])));
+        BufferedReader br = new BufferedReader(new FileReader(conf.get(index[7])));
         ArrayList<String> emptyWords = Stopper.loadEmptyWords(br);
         
-      //PATH OF EACH DOCUMENT IN THE COLLECTION
-        HashMap<Integer, String> ID = new HashMap<>();        
+      //DATA STRUCTURE WITH NUMBER OF DOCUMENT AND ABSOLUTLY PATH OF DOCUMENT
+        HashMap<Integer, String> IdCollection = new HashMap<>();        
         int objtIndex = 1;
         
         //MAIN LOOP
@@ -84,25 +86,31 @@ public class IRS {
             String noAccents = Tokenization.cleanAccents(noHTML);
             
             //CREATION OF NEW FILES AFTER PROCESS THEM
-            String newPath = conf.get(index[1]) + '\\' + name;
-            String newPathEW = conf.get(index[2]) + '\\' + name;
-            String newPathStemmer = conf.get(index[4]) + '\\' + name;
+            //path with stopper
+            String newPath = conf.get(index[3]) + '\\' + name;
+            //path with empty words
+            String newPathEW = conf.get(index[5]) + '\\' + name;
+            //path with stemmer
+            String newPathStemmer = conf.get(index[9]) + '\\' + name;
             
             //WRITE IN THE FOLDERS
-            BufferedWriter bw, bwEW, bwStemmer, bwIndex;
+            BufferedWriter bw, bwEW, bwStemmer;
+            //buffered writer with stopper
             bw = new BufferedWriter(new FileWriter(newPath));
+            //buffered writer with empty words
             bwEW = new BufferedWriter(new FileWriter(newPathEW));
+            //buffered writer with stemmer
             bwStemmer = new BufferedWriter(new FileWriter(newPathStemmer));
             
             //TOKENIZATION
-            count = Tokenization.tokenization(bw, noAccents);
-            countAll += count;
+            countTokenization = Tokenization.tokenization(bw, noAccents);
+            countAllTokenization += countTokenization;
             
             //STOPPER
             String noEmptyWords = Stopper.tokenizationAfter(emptyWords, bwEW, noAccents);
             
-            countAfter = StringUtils.countMatches(noEmptyWords, "\n");
-            countAllAfter += countAfter;
+            countStopper = StringUtils.countMatches(noEmptyWords, "\n");
+            countAllStopper += countStopper;
             
             //STEMMER
             String noRoots = Stemmer.roots(noEmptyWords, bwStemmer);
@@ -111,30 +119,30 @@ public class IRS {
             countAllStemmer += countStemmer;
             
             //INDEX
-            ID.put(objtIndex, file.getAbsolutePath());
+            IdCollection.put(objtIndex, file.getAbsolutePath());
             objtIndex++;
              
             //OPERATIONS
             //MINIMUM
-            if (count < min1) min1 = count;
-            if (countAfter < min2) min2 = countAfter;
-            if (countStemmer < min3) min3 = countStemmer;
+            if (countTokenization < minTokenization) minTokenization = countTokenization;
+            if (countStopper < minStopper) minStopper = countStopper;
+            if (countStemmer < minStemmer) minStemmer = countStemmer;
             
             //MAXIMUM
-            if (count > max1) max1 = count;
-            if (countAfter > max2) max2 = countAfter;
-            if (countStemmer > max3) max3 = countStemmer;
+            if (countTokenization > maxTokenization) maxTokenization = countTokenization;
+            if (countStopper > maxStopper) maxStopper = countStopper;
+            if (countStemmer > maxStemmer) maxStemmer = countStemmer;
 
         }
         
-        //Write in the XML file called ID
+        //Write in the XML file called ID with main data structure "IdCollection"
         Element docu = new Element("document");
         Document docum = new Document(docu);
         docum.setRootElement(docu);
-        ID.entrySet().stream().map((Map.Entry<Integer, String> entry) -> {
+        IdCollection.entrySet().stream().map((Map.Entry<Integer, String> entry) -> {
             Element word = new Element("word");
                 word.addContent(new Element("key").setText(entry.getKey().toString()));
-                word.addContent(new Element("value").setText(entry.getValue().toString()));
+                word.addContent(new Element("value").setText(entry.getValue()));
             return word;
         }).forEachOrdered((word) -> {
             docum.getRootElement().addContent(word);
@@ -142,30 +150,30 @@ public class IRS {
         });
         XMLOutputter xmlOutputID = new XMLOutputter();
         xmlOutputID.setFormat(Format.getPrettyFormat());
-        xmlOutputID.output(docum, new FileWriter(conf.get(index[5]) + '\\' + "ID.xml"));
-        //end of the XML file IDF
+        xmlOutputID.output(docum, new FileWriter(conf.get(index[11]) + '\\' + "IdCollection.xml"));
+        //end of the XML file IdCollection
         
         //TOP 5 OF EACH MODULE
-        ArrayList<Pair<String, Integer>> mostFreq = top5(conf.get(index[1]));
-        ArrayList<Pair<String, Integer>> mostFreqAfter = top5(conf.get(index[2]));
-        ArrayList<Pair<String, Integer>> mostFreqStem = top5(conf.get(index[4]));
+        ArrayList<Pair<String, Integer>> mostFreq = top5(conf.get(index[3]));
+        ArrayList<Pair<String, Integer>> mostFreqAfter = top5(conf.get(index[5]));
+        ArrayList<Pair<String, Integer>> mostFreqStem = top5(conf.get(index[9]));
         
       
         //OUTPUT OF DATA
         System.out.println("-----------------------------------------------");
         System.out.println("-             AFTER TOKENIZATION:             -");
         System.out.println("-----------------------------------------------");
-        System.out.println("We have: "+countAll+" words.");
-        System.out.println("We have: "+countAll/files.length+" per file.");
+        System.out.println("We have: "+countAllTokenization+" words.");
+        System.out.println("We have: "+countAllTokenization/files.length+" per file.");
         System.out.println("We have: "+files.length+" documents.");
         System.out.println("");
         System.out.println("-----------------------------------------------");
         System.out.println("-        Before of remove empty words:        -");
         System.out.println("-----------------------------------------------");
-        System.out.println("We have: "+countAll+" words.");
-        System.out.println("We have: "+countAll/files.length+" per file.");
-        System.out.println("Maximum is: "+max1+" words.");
-        System.out.println("Minimum is: "+min1+" words.");
+        System.out.println("We have: "+countAllTokenization+" words.");
+        System.out.println("We have: "+countAllTokenization/files.length+" per file.");
+        System.out.println("Maximum is: "+maxTokenization+" words.");
+        System.out.println("Minimum is: "+minTokenization+" words.");
         System.out.println("Top 5 are:");
         for (int i=0; i<mostFreq.size(); i++){
             System.out.println(i+1+". "+mostFreq.get(i).getFirst()+": "+mostFreq.get(i).getSecond()+" times");
@@ -174,10 +182,10 @@ public class IRS {
         System.out.println("-----------------------------------------------");
         System.out.println("-        After of remove empty words:         -");
         System.out.println("-----------------------------------------------");
-        System.out.println("We have: "+countAllAfter+" words.");
-        System.out.println("We have: "+countAllAfter/files.length+" per file.");
-        System.out.println("Maximum is: "+max2+" words.");
-        System.out.println("Minimum is: "+min2+" words.");
+        System.out.println("We have: "+countAllStopper+" words.");
+        System.out.println("We have: "+countAllStopper/files.length+" per file.");
+        System.out.println("Maximum is: "+maxStopper+" words.");
+        System.out.println("Minimum is: "+minStopper+" words.");
         System.out.println("Top 5 are:");
         for (int i=0; i<mostFreqAfter.size(); i++){
             System.out.println(i+1+". "+mostFreqAfter.get(i).getFirst()+": "+mostFreqAfter.get(i).getSecond()+" times");
@@ -188,8 +196,8 @@ public class IRS {
         System.out.println("-----------------------------------------------");
         System.out.println("We have: "+countAllStemmer+" words.");
         System.out.println("We have: "+countAllStemmer/files.length+" per file.");
-        System.out.println("Maximum is: "+max3+" words.");
-        System.out.println("Minimum is: "+min3+" words.");
+        System.out.println("Maximum is: "+maxStemmer+" words.");
+        System.out.println("Minimum is: "+minStemmer+" words.");
         System.out.println("Top 5 are:");
         for (int i=0; i<mostFreqStem.size(); i++){
             System.out.println(i+1+". "+mostFreqStem.get(i).getFirst()+": "+mostFreqStem.get(i).getSecond()+" times");
@@ -199,7 +207,8 @@ public class IRS {
         System.out.println("-           After of create index:            -");
         System.out.println("-----------------------------------------------");
         System.out.println("We have: "+files.length+" files.");
-        HashMap<String, Integer> DS = Index.loadDataStructure(conf.get(index[4]));
+        //main data structure with word and frequency
+        HashMap<String, Integer> DS = Index.loadDataStructure(conf.get(index[9]));
         System.out.println("We have: "+DS.size()+" different words.");
         System.out.println("");
         System.out.println("-----------------------------------------------");
@@ -207,7 +216,7 @@ public class IRS {
         System.out.println("-----------------------------------------------");
         
         HashMap<Integer, HashMap<String,Double>> VSMstructure = new HashMap<>();
-        VSMstructure = VSM.highestFrequency(conf.get(index[4]));
+        VSMstructure = VSM.highestFrequency(conf.get(index[9]));
         HashMap<String, Double> idf = VSM.idf(VSMstructure, files.length);
         
         //Write in the XML file IDF
@@ -225,12 +234,14 @@ public class IRS {
         });
         XMLOutputter xmlOutputIDF = new XMLOutputter();
         xmlOutputIDF.setFormat(Format.getPrettyFormat());
-        xmlOutputIDF.output(document, new FileWriter(conf.get(index[6]) + '\\' + "IDF.xml"));
+        xmlOutputIDF.output(document, new FileWriter(conf.get(index[13]) + '\\' + "IDF.xml"));
         //end of the XML file IDF
         
+        //weight of word without normalize
         HashMap<Integer, HashMap<String,Double>> wij = VSM.wij(idf, VSMstructure);
         
-        HashMap<Integer, HashMap<String,Double>> wnij = VSM.wnij(wij, idf);
+        //normalized weight of word
+        HashMap<Integer, HashMap<String,Double>> wnij = VSM.wnij(wij);
         
         //Write in the XML file WNij
         Element collection = new Element("collection");
@@ -255,7 +266,7 @@ public class IRS {
         });
         XMLOutputter xmlOutput = new XMLOutputter();
         xmlOutput.setFormat(Format.getPrettyFormat());
-        xmlOutput.output(doc, new FileWriter(conf.get(index[7]) + '\\' + "WNij.xml"));
+        xmlOutput.output(doc, new FileWriter(conf.get(index[15]) + '\\' + "WNij.xml"));
         //end of the XML file WNij
             
         System.out.println("");

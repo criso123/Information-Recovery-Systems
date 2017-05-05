@@ -35,20 +35,19 @@ public class Index {
         PriorityQueue<Pair<String, Integer>> list = new PriorityQueue<>(10,(o1, o2) -> {
             return ((int) o2.getSecond() - (int) o1.getSecond());
         });
-        HashMap<String,Integer> map = new HashMap<>();
+        HashMap<String,Integer> output = new HashMap<>();
 
         BufferedReader br;
         String word;
-        HashMap<String, Integer> output = new HashMap<>();
         File[] files = new File(path).listFiles();
 
         for (File file: files){
             br = new BufferedReader(new FileReader(file));
             while ( (word = br.readLine()) != null) {
-                if (map.containsKey(word)) 
-                    map.put(word, map.get(word) + 1);
+                if (output.containsKey(word)) 
+                    output.put(word, output.get(word) + 1);
                 else 
-                    map.put(word, 1);
+                    output.put(word, 1);
                 cont++;
                 
             }
@@ -65,10 +64,10 @@ public class Index {
         System.out.println("The document shortest is: "+pathMin+", with: "+min+" words.");
         System.out.println("The document longest is: "+pathMax+", with: "+max+" words.");
         
-        map.entrySet().stream().map((entry) -> new Pair<>(entry.getKey(),entry.getValue())).forEachOrdered((tuple) -> {
+        output.entrySet().stream().map((entry) -> new Pair<>(entry.getKey(),entry.getValue())).forEachOrdered((tuple) -> {
             list.offer(tuple);
         });
         
-        return map;
+        return output;
     }
 }
