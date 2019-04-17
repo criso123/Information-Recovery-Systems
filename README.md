@@ -1,6 +1,32 @@
 # Information-Recovery-Systems
 
-It´s a introduction to Natural Processing Language with a collection of files from University of Jaén. This project is divided in different classes:
+It´s a introduction to Natural Processing Language with a collection of files from University of Jaén. 
+
+This project has been created with Netbeans and Java, the structure is:
+ - build: Netbeans field created by default
+ 
+ 
+ - coleccionESuja2017: Collection of articles in html format provided by University of Jaén 
+ 
+ 
+ - dist: Netbeans field created by default
+ 
+ - index: Creation of a dictionary with different words
+ 
+ - library: Libraries used in the project
+ - nbproject: Netbeans field created by default
+ - normalizate: Collection of articles without format and with all words that the article contains
+ - src: Code source
+ - stemmer: Collection of articles with roots of each word from normalizate field
+ - stopper: Collection of articles without empty words from stemmer field
+ - documentación.pdf: Paper in spanish explain the project and with examples
+ - build.xml: Netbeans file created by default
+ - conf.data: File with paths that will be passed as parameters
+ - manifest.mf: Netbeans file created by default
+ - palabrasVacias.txt: Empty words collection
+ - Searcher: Field with visual application and the step 6
+ 
+This project is divided in different classes:
   1. Tokenization.java
     1.1. removeHTML function: Remove all HTML tags from collection
     1.2. cleanAccents function: Change all words to lowercase and maintain the letters of the alphabet and numbers
@@ -24,22 +50,3 @@ It´s a introduction to Natural Processing Language with a collection of files f
     6.2. sortByValue function: Return a sorted map
     
   As improvement, I created a PRF module that it use Pseudo-relevance feedback algorithm
-
-This project has been created with Netbeans and Java, the structure is:
- - build: Netbeans field created by default
- - coleccionESuja2017: Collection of articles in html format provided by University of Jaén 
- - dist: Netbeans field created by default
- - index: Creation of a dictionary with different words
- - library: Libraries used in the project
- - nbproject: Netbeans field created by default
- - normalizate: Collection of articles without format and with all words that the article contains
- - src: Code source
- - stemmer: Collection of articles with roots of each word from normalizate field
- - stopper: Collection of articles without empty words from stemmer field
- - documentación.pdf: Paper in spanish explain the project and with examples
- - build.xml: Netbeans file created by default
- - conf.data: File with paths that will be passed as parameters
- - manifest.mf: Netbeans file created by default
- - palabrasVacias.txt: Empty words collection
- - searcher: Field with visual application and the step 6
- 
